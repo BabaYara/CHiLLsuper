@@ -3,9 +3,16 @@ Integer Constraint Solver to generate
 actual (and valid) CHiLL script instances
 '''
 from constraint import *
-    
-xforms = [] #list of xforms in order
+ 
+params= [] # list of 3-tuples, (name, type, [domain])
+knowns = [] # list of constraints
+xforms = [] #list of xforms in order, 
 problem = Problem()
+
+class Param:
+    name = ''
+    type = ''
+    domain = None
 
 def generate_parameter_domain(superscript):
     prefix = ""
@@ -31,10 +38,42 @@ def generate_parameter_domain(superscript):
     
     while('@end_param_region' not in lines[lno]):
         if(lines[lno].startswith('param')):
-            print 'param line'
+            '''
+            param line looks like the following
+            
+            param(name,type,[val0,val1,...,valn])
+
+            name - any alphanumeric constant
+            type - Enum
+            values - a list of values
+            '''
+
+            args = lines[lno][6:-2].split(',') # val0 and valn will have [,] connected to them. Remove
+            args[2] = args[2].split('[')[1]
+            args[-1] = args[-1].split(']')[0]
+    
+            p = Param()
+            p.name = args[0]
+            p.type = args[1]
+            p.domain = []
+            for val in args[2:]:
+                p.domain.append(val)
+
+            #print p.name, p.type, p.domain
+
+            
+            
         
         elif(lines[lno].startswith('known')):
-            print 'known line'
+             '''
+            known line looks like the following
+            
+            known(c1,c2,...,cn)
+
+            where ci is a relation between one or more parameters
+            '''
+
+
 
         elif(lines[lno].startswith('')):
             pass
