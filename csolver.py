@@ -61,18 +61,21 @@ def generate_parameter_domain(superscript):
 
             #print p.name, p.type, p.domain
 
-            
+            params.append(p)           
             
         
         elif(lines[lno].startswith('known')):
-             '''
+            '''
             known line looks like the following
             
             known(c1,c2,...,cn)
 
             where ci is a relation between one or more parameters
             '''
-
+            cons = lines[lno][6:-2].split(',')
+        
+            for c in cons: 
+                knowns.append(c)
 
 
         elif(lines[lno].startswith('')):
@@ -84,9 +87,6 @@ def generate_parameter_domain(superscript):
     while(lno<nlines):
         suffix += lines[lno]
         lno += 1
-
-    print suffix
-    
     
     file.close()
 
