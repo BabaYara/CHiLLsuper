@@ -1,1 +1,4 @@
 A parser to generate CHiLL script instances from a parameterized CHiLL superscript.
+
+  import csolver
+  csolver.generate_parameter_domain('path-to-superscript')
