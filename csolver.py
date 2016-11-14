@@ -8,7 +8,7 @@ import re
 varnames = [] # a list of variable names for fast access
 params= [] # list of 3-tuples, (name, type, [domain])
 knowns = [] # list of constraints
-
+xforms = []
 XFORMS = ['tile', 'distribute', 'skew', 'fuse', 'permute', 'omp_par_for', 'partial_sums'] #list of xforms in order, 
 
 problem = Problem()
@@ -18,9 +18,23 @@ class Param:
     type = ''
     domain = None
 
+class Xform:
+    id = -1     #keeps track of the global ordering of parameterized xforms
+    type = ''
+    vals = []   #vars involved in the xform
+
+'''
+def generate_xfor_regex:
+    xregex = ''
+    for xform in XFORMS:
+        xregex+=xform+'|'
+    return xregex[:-1] #chop the last '|' off
+'''
+
 def generate_parameter_domain(superscript):
     prefix = ""
     suffix = ""
+    num_x = -1
 
     file = open(superscript,'r')
     lines = file.readlines()
@@ -37,6 +51,8 @@ def generate_parameter_domain(superscript):
         prefix += lines[lno]
         lno += 1
     
+    lno += 1
+
     #scan through the code and add variables and constraints
     # Then ask the solver to to give us valid points
 
@@ -83,7 +99,7 @@ def generate_parameter_domain(superscript):
             where ci is a relation between one or more parameters
             '''
             cons = lines[lno][6:-2].split(',')
-        
+            
             for c in cons: 
                 knowns.append(c)
                 # find what variables are in the constraint
@@ -114,10 +130,28 @@ def generate_parameter_domain(superscript):
              
         else:
             '''
-            we expect everything else to represent a parameterized xform. 
-            If something's wrong, CHiLL shall catch it
+            we expect everything else inside the param region to represent a parameterized xform, (because a rigorous check is expensive, poor excuse)
+            If something's wrong, CHiLL shall(will) catch it
             '''
-            pass
+            num_x += 1
+            x = Xform()
+            x.id = num_x
+            
+            toks = re.split('\(|\)',lines[lno])
+            #print toks[0]
+            if toks[0] in XFORMS:
+                #we are good to go
+                x.type = toks[0]
+
+                #extract arg values now
+                args = toks[1].split(',')
+                for arg in args:
+                    x.vals.append(arg)
+
+                xforms.append(x)
+
+            else:
+                print 'Bad xform found in line '+str(lno)
 
         lno += 1
 
