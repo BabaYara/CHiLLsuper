@@ -155,6 +155,8 @@ def generate_parameter_domain(superscript):
 
         lno += 1
 
+    lno += 1 #skip @end_param_region
+
     #solve the constraint problem
     solutions = problem.getSolutions()
     print solutions
@@ -162,3 +164,29 @@ def generate_parameter_domain(superscript):
     while(lno<nlines):
         suffix += lines[lno]
         lno += 1
+
+#=================================================================================
+# reading, processing done! Next --> codegen
+
+    for script in range(len(solutions)):
+        block = ''
+        param_values = solutions[script]
+
+        for xform in xforms:
+            block += xform.type+'('
+
+            for v in xform.vals:
+                if v in varnames:
+                    block += str(param_values[v])+','
+                else: #direct value
+             
+                    block += v+','
+            
+            block = block[:-1]+')\n'
+        
+        full_script = prefix+'\n'+block+'\n'+suffix
+        
+        f = open('script_{0}.chill'.format(str(script)),'w')
+        f.write(full_script)
+        f.close()
+
