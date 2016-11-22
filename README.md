@@ -10,3 +10,7 @@ CHiLL superscript syntax overview
     known(c1,...,cn)            #define constraints between parameters
     t(f(x))                     #call CHiLL transformation t in terms of defined parameters
     @end_param_region           #end the innermost parameterized region
+
+These constraints are currently supported, `==`, `!=`, `<`,`>`, `<=`, `>=`.
+
+Note: superscripts do not perform transformation validity checks and rely on CHiLL's dependence analysis to ensure correctness.
